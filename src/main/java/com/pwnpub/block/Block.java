@@ -1,5 +1,7 @@
 package com.pwnpub.block;
 
+import com.pwnpub.consensus.Pow;
+import com.pwnpub.consensus.PowResult;
 import com.pwnpub.util.ByteUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,15 +41,25 @@ public class Block {
      */
     private long height;
 
+    /**
+     * random val
+     */
+    private long nonce;
+
     public static Block createBlock(String prevBlockHash, String data, long height) {
         Block block = new Block(
                 "",
                 prevBlockHash,
                 data,
                 Instant.now().getEpochSecond(),
-                height);
+                height,
+                0);
         // set current block value
-        block.setHash();
+        // block.setHash();
+        Pow pow = Pow.createProofOfWork(block);
+        PowResult powResult = pow.collision();
+        block.setHash(powResult.getHash());
+        block.setNonce(powResult.getNonce());
         return block;
     }
 
