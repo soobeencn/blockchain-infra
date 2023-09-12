@@ -15,7 +15,7 @@ import java.math.BigInteger;
 @Data
 public class Pow {
     /**
-     *
+     * 挖矿难度
      * hash val: 256bit二进制数
      * 1 byte = 8 bit  32
      * 1 hex = 4bit 64
@@ -78,15 +78,19 @@ public class Pow {
     public PowResult collision() {
         long nonce = 0;
         String shaHex = "";
-        System.out.println("Ready to mine: ");
+        System.out.println("准备开始挖矿: ");
+        long startTime = System.currentTimeMillis();
         System.out.println(this.getBlock().getData());
         while (nonce < Long.MAX_VALUE) {
             //1.获取要生成hash的byte数据
             byte[] data = this.prepareData(nonce);
             //2.通过sha256算法, 生成hash
             shaHex = DigestUtils.sha256Hex(data);
+            System.out.printf("\r%d: %s", nonce, shaHex);
             //3.判断实际hash, 是否小于目标hash
             if (new BigInteger(shaHex, 16).compareTo(this.target) == -1) {
+                System.out.printf("耗时 Time: %s seconds \n", (System.currentTimeMillis() - startTime)/1000);
+                System.out.printf("当前区块的Hash: %s\n\n", shaHex);
                 break;
             }else {
                 nonce++;
@@ -94,8 +98,4 @@ public class Pow {
         }
         return new PowResult(nonce, shaHex);
     }
-
-
-
-
 }
